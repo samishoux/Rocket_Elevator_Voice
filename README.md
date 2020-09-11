@@ -31,8 +31,6 @@ We only managed to very who is talking in postman and here is the steps
 4.  Next to the ``identificationProfileIds`` you will have a field full of id's. At the end of this field, add a comas then the id of the profile that you just created.
 5. Click on Body
 6. Input your wav file that you want to verify
-
-
 ### Retreive the list of profile
 To retreive the list of profile we only managed to do it in postman
 1. Open postman
@@ -40,4 +38,9 @@ To retreive the list of profile we only managed to do it in postman
 3. Click on the send button
 
 This will output an array of profile
+### Get the ouput of a wav file as text
+We managed to get this one to work in js
+1. Drop the wav file that you want to output inside the root of the folder
+2. Change the ``filename`` variable to the name of your file
+3. Run the index with ether ``npm index.js`` or right click and run
 
