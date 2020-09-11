@@ -11,7 +11,7 @@ const { EEXIST } = require('constants');
 // through the speech recognizer.
 var subscriptionKey = "55afa428bef1466e99eaceb920b018b8";
 var serviceRegion = "westus"; // e.g., "westus"
-var filename = "2020-09-09 11-08-48(1).wav"; // 16000 Hz, Mono
+var filename = "Test1.wav"; // 16000 Hz, Mono
 var textfile = "";
 
 
