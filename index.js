@@ -2,6 +2,9 @@ const axios = require('axios');
 // pull in the required packages.
 var sdk = require("microsoft-cognitiveservices-speech-sdk");
 var fs = require("fs");
+const { Console } = require('console');
+const { EEXIST } = require('constants');
+
 // replace with your own subscription key,
 // service region (e.g., "westus"), and
 // the name of the file you want to run
@@ -9,6 +12,7 @@ var fs = require("fs");
 var subscriptionKey = "55afa428bef1466e99eaceb920b018b8";
 var serviceRegion = "westus"; // e.g., "westus"
 var filename = "2020-09-09 11-08-48(1).wav"; // 16000 Hz, Mono
+var textfile = "";
 
 
 
@@ -47,6 +51,7 @@ var filename = "2020-09-09 11-08-48(1).wav"; // 16000 Hz, Mono
       pushStream.close();
     });
     
+    
     // we are done with the setup
     console.log("Now recognizing from: " + filename);
     
@@ -60,22 +65,54 @@ var filename = "2020-09-09 11-08-48(1).wav"; // 16000 Hz, Mono
     
     // create the speech recognizer.
     var recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
+
+    //recognizer.recognizing = function (s, e) {
+    //  var str = "(recognizing) Reason: " + sdk.ResultReason[e.result.reason] + " Text: " + e.result.text;
+    //  console.log(str);
+    //};
+    recognizer.recognized = function (s, e) {
+      // Indicates that recognizable speech was not detected, and that recognition is done.
+      if (e.result.reason === sdk.ResultReason.NoMatch) {
+          var noMatchDetail = sdk.NoMatchDetails.fromResult(e.result);
+          console.log("\r\n(recognized)  Reason: " + sdk.ResultReason[e.result.reason] + " NoMatchReason: " + sdk.NoMatchReason[noMatchDetail.reason]);
+      } else {
+        console.log("\r\n(recognized)  Reason: " + sdk.ResultReason[e.result.reason] + " Text: " + e.result.text);
+        textfile += e.result.text + ' \r ';
+        fs.writeFile('Output.txt', textfile, (err) => {
+
+          if (err) throw err;
+        })
+            }
+    };
+    recognizer.sessionStarted = function (s, e) {
+      var str = "(sessionStarted) SessionId: " + e.sessionId;
+      console.log(str);
+    };
+
+    // Signals the end of a session with the speech service.
+    recognizer.sessionStopped = function (s, e) {
+        var str = "(sessionStopped) SessionId: " + e.sessionId;
+        console.log(str);
+    };
+
+    // Signals that the speech service has started to detect speech.
+    recognizer.speechStartDetected = function (s, e) {
+        var str = "(speechStartDetected) SessionId: " + e.sessionId;
+        console.log(str);
+    };
+
+    // Signals that the speech service has detected that speech has stopped.
+    recognizer.speechEndDetected = function (s, e) {
+        var str = "(speechEndDetected) SessionId: " + e.sessionId;
+        console.log(str);
+    };
     
     // start the recognizer and wait for a result.
-    recognizer.recognizeOnceAsync(
-      function (result) {
-        console.log(result.privText);
-    
-        recognizer.close();
-        recognizer = undefined;
-      },
-      function (err) {
-        console.trace("err - " + err);
-    
-        recognizer.close();
-        recognizer = undefined;
-      });
+    recognizer.startContinuousRecognitionAsync();
+      
     // </code>
     
   }());
+
+    
     
